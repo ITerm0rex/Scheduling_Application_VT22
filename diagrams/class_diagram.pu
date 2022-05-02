@@ -1,0 +1,285 @@
+@startuml Class Diagram
+title Class Diagram
+
+class CSVio
+{
+	-Name:string
+	
+	+read (): void
+	+write(): void
+	
+}
+
+' interface schedule
+class schedule
+{
+	-place:string
+	-date: string
+	-time: string
+	-group: string
+	-competitors: array
+	-disipline: string
+	-station: string or int
+	-round:string 
+	+CreateSchedule (): void
+	+updateSchedule(): void
+	+printSchedule (): void
+}
+
+class Stations
+{
+	-id: int
+	-Place: string
+	-Slots: int
+	-empty: bool
+	+createStation(): void
+}
+
+class grupp
+{
+	-id: int
+	-age: int
+	-sex: char
+	-name: string
+	-list: athletes
+}
+class Athletes
+{
+	-id: int
+	-name: string
+	-surname: string
+	-age: int
+	-club: string
+	-sex: char
+	-records[]:float
+
+	+get_records():array
+	+add_to_group(): void
+}
+
+class Sub_competition
+{
+	-id: int
+	-Name: string
+	-Datum: string
+	-Start_Finish_time: int
+	-Delay: int
+	-list: athletes
+
+	+Add_Athlets ():void
+	+Print_Althlets():void
+	+duration():int
+	+get_winners():array
+	+Add_Delay():int
+	+selectStation(): int
+	+createsemfinal():void
+	+createfinal():void
+	+addtoschedule():void
+	+delay_competition ():void 
+}
+
+class Running
+{
+	-distance: string
+	-trials: int
+}
+
+class Jumping
+{
+	-type: string
+	-trials: int
+}
+
+class Throwing
+{
+	-trials: int
+}
+
+
+CSVio <-. Athletes
+Athletes " 0-N "--> " 1 " Stations
+Athletes --> schedule
+
+Athletes" 1..N " --> " 1..N " Sub_competition
+CSVio <-. Sub_competition 
+
+Sub_competition " 1 " <|- " N " Running
+Sub_competition " 1 " <|- " N " Jumping
+Sub_competition " 1 " <|- " N " Throwing
+
+Stations " 1 " o-- " N " Running
+Stations " 1 " o-- " N " Jumping
+Stations " 1 " o-- " N " Throwing
+
+Sub_competition .-> schedule
+Stations "1" <-- "N" Sub_competition
+grupp "1" o-- "N" Athletes
+@enduml
+
+' @startuml
+' title Class Diagram
+
+' class CSV_FILE
+' {
+' 	-Name:string
+	
+' 	+read (): void
+' 	+write(): void	
+' }
+
+' interface schedule 
+' {
+' 	+CreateSchedule (): void
+' 	+updateSchedule(): void
+' 	+printSchedule (): void
+	
+' }
+
+' class Stations
+' {
+' 	-Place: string
+' 	-Slots: int
+' 	-empty: bool
+' 	+createStation(): void
+' }
+
+' class Athletes 
+' {
+' 	-Name: string
+' 	-surname:string
+' 	-Age: int
+' 	-Club: string
+' 	-Sex: char
+' 	-Records[]:float
+	
+' 	+get_records():array
+' 	+add_to_group(): void
+' }
+
+' class Sup_comptition
+' {
+' 	-Name: string 
+' 	-Datum: string
+' 	-Start_Finish_time: int
+' 	-Delay: int
+' 	-list: athletes
+	
+' 	+Add_Athlets ():void 
+' 	+Print_Althlets():void
+' 	+duration():int 
+' 	+get_winners():array
+' 	+Add_Delay():int	
+' 	+selectStation(): int
+' }
+
+' class Running 
+' {
+' 	-distince: string
+' 	-trials: int
+' }
+
+' class Jumping 
+' {
+' 	-Type: string
+' 	-trials: int
+' }
+
+' class Throwing 
+' {
+' 	-trials: int
+' }
+
+
+' Athletes .-> CSV_FILE
+' Athletes " 0-N ".-> " 1 " Stations
+
+' Athletes" 1 " - " 1.. " Sup_comptition 
+' Sup_comptition .-> schedule
+
+' Sup_comptition " 1 " *-- " N " Running
+' Sup_comptition " 1 " *-- " N " Jumping
+' Sup_comptition " 1 " *-- " N " Throwing
+
+' Stations " 1 " o-- " N " Running
+' Stations " 1 " o-- " N " Jumping
+' Stations " 1 " o-- " N " Throwing
+
+' @enduml
+
+
+' @startuml
+' title Class Diagram
+
+' interface CSV_FILE
+' {
+' 	-Name:string
+	
+' 	+read (): void
+' 	+write(): void	
+' }
+
+' class Stations
+' {
+' 	-Pleace: string
+' 	-Slots: int
+' }
+
+' class Athlets 
+' {
+' 	-Name: string
+' 	-surname:string
+' 	-Age: int
+' 	-Club: string
+' 	-Sex: char
+' 	-Records[]:float
+	
+' 	+get_records():array
+' }
+
+' class Sup_comptition
+' {
+' 	-Name: string 
+' 	-Datum: string
+' 	-Start_Finish_time: int
+' 	-Delay: int
+' 	-list: array 
+	
+' 	+Add_Athlets ():void 
+' 	+Print_Althlets():void
+' 	+duration():int 
+' 	+get_winner():array
+' 	+Add_Delay():int	
+' }
+
+' class Running 
+' {
+' 	-distince: string
+' 	-trials: int
+' }
+
+' class Jumping 
+' {
+' 	-Typ: string
+' 	-trials: int
+' }
+
+' class Throwing 
+' {
+' 	-trials: int
+' }
+
+
+' Athlets .-> CSV_FILE
+' Athlets " 0-N ".-> " 1 " Stations
+
+' Athlets" 1 " - " 1.. " Sup_comptition 
+
+' Sup_comptition " 1 " *-- " N " Running
+' Sup_comptition " 1 " *-- " N " Jumping
+' Sup_comptition " 1 " *-- " N " Throwing
+
+' Stations " 1 " o-- " N " Running
+' Stations " 1 " o-- " N " Jumping
+' Stations " 1 " o-- " N " Throwing
+
+' @enduml

@@ -1,0 +1,8 @@
+{
+	"java.configuration.updateBuildConfiguration": "interactive",
+	"maven.view": "flat",
+	// "java.debug.settings.console": "internalConsole",
+	"debug.internalConsoleOptions": "openOnSessionStart",
+	"terminal.integrated.defaultProfile.windows": "PowerShell",
+	"java.signatureHelp.enabled": true
+}
