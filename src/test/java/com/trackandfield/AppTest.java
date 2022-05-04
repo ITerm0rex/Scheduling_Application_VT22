@@ -2,49 +2,50 @@ package com.trackandfield;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import com.trackandfield.App.io;
-
 import org.junit.Test;
 
-/**
- * Unit test for simple App.
- */
+import static java.util.Arrays.asList;
+
 public class AppTest {
-	/**
-	 * Rigorous Test :-)
-	 */
-	@Test
-	public void shouldAnswerWithTrue() {
-		assertTrue(true);
-	}
-	
+
 	@Test
 	public void testLength() {
-		// var a = new App();
-		// io test = a.new io();
-		// var atl = test.generateAthletes();
-		var rec = new String[]{"","","","","","","","","","",""};
-		
-		rec[1] = "0:0";
-		
-		var atl = new App().new Athletes(0, "club", "name", "surname", 'M', 18, Arrays.asList(rec));
+		var records = asList("", "", "", "", "", "", "", "", "", "", "");
 
-		
-		var len = App.Groups.getDisciplines(atl).size();
-		
-		assertTrue("length is " + len, len == 1);
+		records.set(1, "123:345.789");
+		records.set(10, "1337.42");
+
+		var atl = new Athletes(0, "club", "name", "surname", 'å', 180, records);
+		System.out.println(atl);
+		System.out.println(atl.getAgeGroup());
+		System.out.println(atl.getSexGroup());
+
+		var dis = atl.getDisciplines();
+		var len = dis.size();
+		System.out.println(dis);
+		assertTrue("length is " + len, len == 2);
 	}
-	
+
 	@Test
-	public void testFromFile() {
+	public void testLengthFromFile() {
 		var a = new App();
-		io test = a.new io();
-		var atl = test.generateAthletes();
-		
-		var len = App.Groups.getDisciplines(atl.get(1)).size();
+		var test = a.new io();
+		var atls = test.generateAthletes();
+
+		var atl = atls.get(7);
+
+		System.out.println(atl);
+		System.out.println(atl.getAgeGroup());
+		System.out.println(atl.getSexGroup());
+
+		var dis = atl.getDisciplines();
+		var len = dis.size();
+		System.out.println(dis);
 		assertTrue("length is " + len, len == 4);
+	}
+
+	@Test
+	public void sql_test() {
+		SQLiteJDBC.run();
 	}
 }
