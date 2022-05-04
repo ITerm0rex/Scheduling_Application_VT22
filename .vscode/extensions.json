@@ -1,8 +1,12 @@
 {
 	"recommendations": [
-		"hediet.vscode-drawio",
-		"janisdd.vscode-edit-csv",
 		"PKief.material-icon-theme",
-		"redhat.vscode-xml"
+		"hediet.vscode-drawio",
+		"mechatroner.rainbow-csv",
+		"janisdd.vscode-edit-csv",
+		"vscjava.vscode-java-pack",
+		"redhat.vscode-xml",
+		"redhat.fabric8-analytics",
+		"DavidAnson.vscode-markdownlint"
 	]
 }

@@ -1,8 +1,9 @@
 {
-	"java.configuration.updateBuildConfiguration": "interactive",
+	"java.configuration.updateBuildConfiguration": "automatic",
 	"maven.view": "flat",
 	// "java.debug.settings.console": "internalConsole",
 	"debug.internalConsoleOptions": "openOnSessionStart",
 	"terminal.integrated.defaultProfile.windows": "PowerShell",
-	"java.signatureHelp.enabled": true
+	"java.signatureHelp.enabled": true,
+	"testExplorer.useNativeTesting": true
 }
