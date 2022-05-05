@@ -36,7 +36,7 @@ public class SQLiteJDBC {
 				stmt.execute("select load_extension(\"./sqlite-csv/csv.dll\");");
 
 				stmt.execute("CREATE VIRTUAL TABLE IF NOT EXISTS temp.csv USING csv("
-						// + "filename=\"./resources/Schema_Exempel.csv\""
+						// + "filename=\"./resources/schema-exempel.csv\""
 						// + ",header=yes"
 						// + ",fsep=','"
 						// + ",rsep='\n'"
@@ -46,18 +46,16 @@ public class SQLiteJDBC {
 
 				try (var rs = stmt.executeQuery("select * from csv;")) {
 					var md = rs.getMetaData();
-					var colName = md.getColumnName(3);
-
-					System.err.println(":#" + md.getColumnCount());
-					System.err.println("::" + colName);
-
-					while (rs.next())
-						System.out.println(rs.getObject(colName));
+					var len = md.getColumnCount();
+					while (rs.next()) {
+						for (int i = 1; i <= len; i++)
+							System.out.print("[" + rs.getObject(i) + "]");
+						System.out.println("\n");
+					}
 				}
 			}
 		} catch (Exception e) {
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
-			System.exit(0);
 		}
 		System.out.println("[Opened database successfully]");
 	}
