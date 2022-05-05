@@ -1,25 +1,10 @@
 package com.trackandfield;
 
 import java.io.FileReader;
-import java.io.IOException;
-// import java.io.PrintWriter;
-// import java.lang.ProcessBuilder.Redirect.Type;
-import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
-import java.util.function.Consumer;
-import java.util.regex.Pattern;
-
-// import org.javatuples.Pair;
-// import org.javatuples.Tuple;
-
+import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-
-import com.trackandfield.*;
+import java.util.LinkedList;
 
 public class App {
 
@@ -121,14 +106,119 @@ public class App {
 			return groups;
 		}
 
+		// Generete subcomps
+
+		public List<SubCompetition> generateSubCompetition(final List<Groups> groups) {
+
+			final List<SubCompetition> subComps = new ArrayList<SubCompetition>(); // list of subcomps
+
+			var id = 0;
+			for (final var group : groups) {
+				// put entire group into a buffer
+				final var competitors = new LinkedList<Athletes>(group.athletes);
+
+				double number_of_competitors = competitors.size();
+				double number_of_subSubComp = 0;
+
+				double number_of_slots;
+				int durationMinutes;
+				switch (group.discipline) {
+					case Running_Sprint_60:
+					case Running_Hurdles_60:
+						number_of_slots = 8;
+						durationMinutes = 5;
+						break;
+					case Jumping_Long:
+					case Jumping_Triple:
+					case Jumping_High:
+						number_of_slots = 1;
+						durationMinutes = 5;
+						break;
+					case Throwing_Shot:
+						number_of_slots = 2;
+						durationMinutes = 5;
+						break;
+					case Running_Sprint_200:
+					case Running_Middle_800:
+						number_of_slots = 8;
+						durationMinutes = 5;
+						break;
+					case Running_Middle_1500:
+						number_of_slots = 8;
+						durationMinutes = 10;
+						break;
+					case Running_Long_3000:
+						number_of_slots = 8;
+						durationMinutes = 15;
+						break;
+					default:
+						number_of_slots = 1;
+						durationMinutes = 5;
+						break;
+				}
+
+				// If more competitors than station spots, create qualifiers
+				// if (number_of_competitors > number_of_slots) {
+
+				number_of_subSubComp = Math.ceil(number_of_competitors / number_of_slots);
+				// the main sub competetion is divided into smaller sub competetions if nr of
+				// group members is more than nr of slots : ceil(20 / 8) = 3
+				var max_number_of_Athletes_in_subCom = Math.ceil(number_of_competitors / number_of_subSubComp);
+				// number of Athlets in a sub_comp ceil(20 / 3) = 7
+
+				// [7][7][6]
+				// [1][1][1]...
+
+				for (int i = 0; i < number_of_subSubComp; i++) {
+					// Create new_subComp competition by calling SubCompetition constructor
+					var new_subComp = new SubCompetition(
+							++id,
+							0,
+							"group#:" + group.id,
+							durationMinutes,
+							number_of_subSubComp == 1,
+							group.discipline,
+							new ArrayList<Athletes>());
+					// 1-sub-com 0 -->7
+					// 2- sub-com 7--> 1
+					// 3- sub-comp 14-->20
+					subComps.add(new_subComp);
+
+					for (int j = 0; j < max_number_of_Athletes_in_subCom; j++) {
+						var comp = competitors.pollFirst(); // returns first athlete and removes it from the list
+						if (comp == null)
+							break;
+						// Add athlete to athletes
+						new_subComp.athletes.add(comp);
+					}
+				}
+				// Store sub competition in the sub competition list
+				// }
+				// Create a final
+				// }
+				// } else if (number_of_competitors < number_of_slots && number_of_competitors >
+				// 1) {
+
+				// }
+				// System.out.print("[[Final]]: ");
+				// Create only a final (not enough competitors for a qualifier)
+			}
+			// System.out.println(
+			// "Number of qualifers: " + number_of_subSubComp + ", Duration in minutes: " +
+			// durationMinutes);
+			// }
+
+			return subComps;
+		}
+
 	}
 
 	public static void main(String[] args) {
 
-		// SQLiteJDBC.run();
-
 		// if (true)
 		// return;
+
+		// SQLiteJDBC.run();
 
 		var a = new App();
 
@@ -138,7 +228,26 @@ public class App {
 
 		io test = a.new io();
 
+		var grps = test.generateGroups();
+		// grps.retainAll(grp)
+		// grps.removeIf(filter)
+
+		for (var gr : grps)
+			System.out.println(gr);
+
+		var subs = test.generateSubCompetition(grps);
+		for (var sub : subs)
+			System.out.println(sub);
+
+		// System.out.println(subs.get(1));
+		// System.out.println(subs.get(2));
+
+		if (true)
+			return;
 		// var atls = test.generateAthletes();
+
+		// var als = test.generateGroups();
+		// System.out.println(als.get(1));
 
 		// atls.get(0).test();
 		// atls.get(0).;
