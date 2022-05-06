@@ -28,19 +28,28 @@ public class AppTest {
 
 	@Test
 	public void testLengthFromFile() {
-		var a = new App();
-		var test = a.new io();
-		var atls = test.generateAthletes();
 
-		var atl = atls.get(7);
+		var atls = App.util.generateAthletes();
+		atls.removeIf(x -> x.id != 2);
+		for (var atl : atls)
+			System.out.println(atl);
 
-		System.out.println(atl);
-		System.out.println(atl.getAgeGroup());
-		System.out.println(atl.getSexGroup());
+		System.out.println("-----------");
 
-		var dis = atl.getDisciplines();
-		var len = dis.size();
-		System.out.println(dis);
+		var grps = App.util.generateGroups(atls);
+		// grps.removeIf(x -> x.id != 15);
+		for (var grp : grps)
+			System.out.println(grp);
+
+		System.out.println("-----------");
+
+		var subcs = App.util.generateSubCompetition(grps);
+		// subcs.removeIf(x -> x.id > 1);
+		for (var subc : subcs)
+			System.out.println(subc);
+
+		var len = atls.get(0).getDisciplines().size();
+
 		assertTrue("length is " + len, len == 4);
 	}
 

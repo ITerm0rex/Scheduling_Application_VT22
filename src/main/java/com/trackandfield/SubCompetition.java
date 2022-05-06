@@ -8,35 +8,28 @@ import java.time.Duration;
 // class competetion
 class SubCompetition {
 	int id;
-	int delay;
-	String name;
 	int durationMinutes;
 	boolean isFinal;
-	DISCIPLINES discipline;
-	List<Athletes> athletes;
+	Groups group;
+	List<Athletes> athletes; // competitors
 
-	public SubCompetition(int id, int delay, String name, int durationMinutes, boolean isFinal, DISCIPLINES discipline,
-			List<Athletes> athletes) {
+	public SubCompetition(int id, int durationMinutes, boolean isFinal, Groups group, List<Athletes> athletes) {
 		this.id = id;
-		this.delay = delay;
-		this.name = name;
 		this.durationMinutes = durationMinutes;
 		this.isFinal = isFinal;
-		this.discipline = discipline;
+		this.group = group;
 		this.athletes = athletes;
 	}
 
 	@Override
 	public String toString() {
 		return "SubCompetition ["
-				+ ", id=" + id
-				+ ", name=" + name
-				+ ", athletes#=" + athletes.size()
-				+ ", delay=" + delay
-				+ ", discipline=" + discipline
+				+ "id=" + id
+				+ ", group.id=" + group.id
 				+ ", durationMinutes=" + durationMinutes
+				+ ", athletes#=" + athletes.size()
 				+ ", isFinal=" + isFinal
+				+ ", group.discipline=" + group.discipline
 				+ "]";
 	}
-
 }

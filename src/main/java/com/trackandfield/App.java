@@ -8,11 +8,11 @@ import java.util.LinkedList;
 
 public class App {
 
-	class io {
+	class util {
 		final static String CSV_FILE_PATH = "./resources/registration-list.csv";
 		final static String CSV_NEWLINE_PATTERN = "(\\r\\n|\\n)+";
 
-		public List<Athletes> generateAthletes() {
+		public static List<Athletes> generateAthletes() {
 			List<Athletes> athletes = new ArrayList<Athletes>();
 
 			try (FileReader file = new FileReader(CSV_FILE_PATH);
@@ -53,11 +53,8 @@ public class App {
 			return athletes;
 		}
 
-		public List<Groups> generateGroups() {
+		public static List<Groups> generateGroups(final List<Athletes> athletes) {
 			final List<Groups> groups = new ArrayList<Groups>(); // list to add groups
-			final List<Athletes> athletes = generateAthletes(); // list of all athletes
-
-			int count = 0;
 
 			int id = 0;
 			for (final var athlete : athletes) {
@@ -77,7 +74,6 @@ public class App {
 					var not_found = true;
 
 					for (final var group : groups) { // iterate through all groups
-						count++;
 						if (athlete_ageGroup.equals(group.age_groups)
 								&& athlete_sexGroup.equals(group.sex_groups)
 								&& athlete_discipline.equals(group.discipline)
@@ -101,24 +97,18 @@ public class App {
 
 			}
 
-			System.err.println("generateGroups() iterations#:" + count);
-
 			return groups;
 		}
 
 		// Generete subcomps
 
-		public List<SubCompetition> generateSubCompetition(final List<Groups> groups) {
-
+		public static List<SubCompetition> generateSubCompetition(final List<Groups> groups) {
 			final List<SubCompetition> subComps = new ArrayList<SubCompetition>(); // list of subcomps
 
 			var id = 0;
 			for (final var group : groups) {
 				// put entire group into a buffer
 				final var competitors = new LinkedList<Athletes>(group.athletes);
-
-				double number_of_competitors = competitors.size();
-				double number_of_subSubComp = 0;
 
 				double number_of_slots;
 				int durationMinutes;
@@ -135,20 +125,20 @@ public class App {
 						durationMinutes = 5;
 						break;
 					case Throwing_Shot:
-						number_of_slots = 2;
+						number_of_slots = 1;
 						durationMinutes = 5;
 						break;
 					case Running_Sprint_200:
 					case Running_Middle_800:
-						number_of_slots = 8;
+						number_of_slots = 6;
 						durationMinutes = 5;
 						break;
 					case Running_Middle_1500:
-						number_of_slots = 8;
+						number_of_slots = 6;
 						durationMinutes = 10;
 						break;
 					case Running_Long_3000:
-						number_of_slots = 8;
+						number_of_slots = 6;
 						durationMinutes = 15;
 						break;
 					default:
@@ -157,10 +147,9 @@ public class App {
 						break;
 				}
 
-				// If more competitors than station spots, create qualifiers
-				// if (number_of_competitors > number_of_slots) {
+				double number_of_competitors = competitors.size();
 
-				number_of_subSubComp = Math.ceil(number_of_competitors / number_of_slots);
+				var number_of_subSubComp = Math.ceil(number_of_competitors / number_of_slots);
 				// the main sub competetion is divided into smaller sub competetions if nr of
 				// group members is more than nr of slots : ceil(20 / 8) = 3
 				var max_number_of_Athletes_in_subCom = Math.ceil(number_of_competitors / number_of_subSubComp);
@@ -169,117 +158,116 @@ public class App {
 				// [7][7][6]
 				// [1][1][1]...
 
-				for (int i = 0; i < number_of_subSubComp; i++) {
-					// Create new_subComp competition by calling SubCompetition constructor
-					var new_subComp = new SubCompetition(
+				// IF there are more competitors than number of slots, we need to create
+				// qualifiers first
+				// A final will be held after the finals, so we create a final
+
+				if (number_of_competitors == 2 && number_of_slots < 2) {
+					var new_final = new SubCompetition(
 							++id,
-							0,
-							"group#:" + group.id,
 							durationMinutes,
-							number_of_subSubComp == 1,
-							group.discipline,
+							true,
+							group,
 							new ArrayList<Athletes>());
-					// 1-sub-com 0 -->7
-					// 2- sub-com 7--> 1
-					// 3- sub-comp 14-->20
-					subComps.add(new_subComp);
+
+					subComps.add(new_final);
+
+					for (int j = 0; j < number_of_competitors; j++) {
+						var comp = competitors.pollFirst(); // returns first athlete and removes it from the list
+						if (comp == null)
+							break;
+						// Add athlete to athletes
+						new_final.athletes.add(comp);
+					}
+				}
+
+				else if (number_of_competitors > number_of_slots) {
+
+					for (int i = 0; i < number_of_subSubComp; i++) {
+						// Create new_subComp competition by calling SubCompetition constructor
+						var new_subComp = new SubCompetition(
+								++id,
+								durationMinutes,
+								false,
+								group,
+								new ArrayList<Athletes>());
+						// 1-sub-com 0 -->7
+						// 2- sub-com 7--> 1
+						// 3- sub-comp 14-->20
+						subComps.add(new_subComp);
+
+						for (int j = 0; j < max_number_of_Athletes_in_subCom; j++) {
+							var comp = competitors.pollFirst(); // returns first athlete and removes it from the list
+							if (comp == null)
+								break;
+							// Add athlete to athletes
+							new_subComp.athletes.add(comp);
+						}
+					}
+
+					// When the final is created, we don't need to worry about the list of athletes,
+					// since
+					// that cannot be pre-determined. If the list is empty, we will simply print out
+					// "TBD (to be determined)"
+					// in our schedule
+					var new_final = new SubCompetition(
+							++id,
+							durationMinutes,
+							true,
+							group,
+							new ArrayList<Athletes>());
+
+					subComps.add(new_final);
+
+				}
+				// If all of the competitors can fit inside of one station, or we have more than
+				// 1 competitor in said group, we will only create a final.
+				// Neither a qualifier or a final would get created if there is only 1 athlete
+				// in a group.
+
+				else if (number_of_competitors > 1) {
+					var new_final = new SubCompetition(
+							++id,
+							durationMinutes,
+							true,
+							group,
+							new ArrayList<Athletes>());
+
+					subComps.add(new_final);
 
 					for (int j = 0; j < max_number_of_Athletes_in_subCom; j++) {
 						var comp = competitors.pollFirst(); // returns first athlete and removes it from the list
 						if (comp == null)
 							break;
 						// Add athlete to athletes
-						new_subComp.athletes.add(comp);
+						new_final.athletes.add(comp);
 					}
 				}
-				// Store sub competition in the sub competition list
-				// }
-				// Create a final
-				// }
-				// } else if (number_of_competitors < number_of_slots && number_of_competitors >
-				// 1) {
-
-				// }
-				// System.out.print("[[Final]]: ");
-				// Create only a final (not enough competitors for a qualifier)
 			}
-			// System.out.println(
-			// "Number of qualifers: " + number_of_subSubComp + ", Duration in minutes: " +
-			// durationMinutes);
-			// }
-
 			return subComps;
 		}
-
 	}
 
 	public static void main(String[] args) {
 
-		// if (true)
-		// return;
+		var atls = App.util.generateAthletes();
+		// atls.removeIf(x -> x.id > 10);
+		// for (var atl : atls)
+		// System.out.println(atl);
 
-		// SQLiteJDBC.run();
+		System.out.println("-----------");
 
-		var a = new App();
+		var grps = App.util.generateGroups(atls);
+		// grps.removeIf(x -> x.id != 15);
+		for (var grp : grps)
+			System.out.println(grp);
 
-		// var t = a.new Throwing();
-		// t.delay = 1;
-		// t.Sub_compet();
+		System.out.println("-----------");
 
-		io test = a.new io();
-
-		var grps = test.generateGroups();
-		// grps.retainAll(grp)
-		// grps.removeIf(filter)
-
-		for (var gr : grps)
-			System.out.println(gr);
-
-		var subs = test.generateSubCompetition(grps);
-		for (var sub : subs)
-			System.out.println(sub);
-
-		// System.out.println(subs.get(1));
-		// System.out.println(subs.get(2));
-
-		if (true)
-			return;
-		// var atls = test.generateAthletes();
-
-		// var als = test.generateGroups();
-		// System.out.println(als.get(1));
-
-		// atls.get(0).test();
-		// atls.get(0).;
-
-		// for (var athlete : atls) {
-		// System.out.println(athlete.id);
-		// }
-
-		// System.out.println(atls.get(0));
-		// System.out.println(atls.get(0).getDisciplines());
-		// System.out.println(atls.get(0).getAgeGroup());
-		// System.out.println(atls.get(0).getSexGroup());
-
-		var gs = test.generateGroups();
-
-		// var subComp = new Sub_competitions(gs);
-
-		System.out.println("number of groups:" + gs.size());
-
-		for (var g : gs) {
-			System.out.println(g.toString());
-		}
-
-		// String s = " " + gs.get(0);
-
-		// for (var g : gs) {
-		// System.out.println(g.athletes.size());
-		// }
-
-		// System.out.println(", ,,".split(",")[0]);
-
-		// Sub_competition<float[]> a = new Sub_competition<float[]>();
+		var subcs = App.util.generateSubCompetition(grps);
+		// subcs.removeIf(x -> x.id > 1);
+		for (var subc : subcs)
+			System.out.println(subc);
 
 	}
 }
