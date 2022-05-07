@@ -1,25 +1,41 @@
 package com.trackandfield;
 
-class Stations {
-	int id;
-	String name;
-	int slots;
-	boolean empty;
+import java.util.ArrayList;
+import java.util.List;
 
-	public Stations(int id, String name, int slots, boolean empty) {
-		this.id = id;
+class Stations {
+	String name;
+	List<Event> events;
+	DISCIPLINES[] disciplines;
+
+	public Stations(String name, DISCIPLINES[] disciplines) {
 		this.name = name;
-		this.slots = slots;
-		this.empty = empty;
+		this.disciplines = disciplines;
+		this.events = new ArrayList<Event>();
 	}
 
-	final Stations Running_Circle = new Stations(1, "Running circle 400m", 6, true);
-	final Stations Sprint_Line = new Stations(2, "Sprint Line (60m, 8 tracks)", 8, true);
-	final Stations Long_Triple_Jump_l = new Stations(3, "Long/Triple Jump-l ", 1, true);
-	final Stations Long_Triple_Jump_ll = new Stations(4, "Long/Triple Jump-ll", 1, true);
-	final Stations High_Jump_I = new Stations(5, "High_Jump-l", 1, true);
-	final Stations High_Jump_II = new Stations(6, "High_Jump_ll", 1, true);
-	final Stations Pole_Vault = new Stations(7, "Pole Vault", 1, true);
-	final Stations Shot_Throwing_I = new Stations(8, "Shot Throwing l", 1, true);
-	final Stations Shot_Throwing_II = new Stations(9, "Shot_Throwing ll", 1, true);
+	final static Stations[] stations = {
+			new Stations("Running circle 400m",
+					new DISCIPLINES[] { DISCIPLINES.Running_Long_3000,
+							DISCIPLINES.Running_Middle_800, DISCIPLINES.Running_Middle_1500,
+							DISCIPLINES.Running_Sprint_200 }),
+			new Stations("Sprint Line 60m",
+					new DISCIPLINES[] { DISCIPLINES.Running_Sprint_60, DISCIPLINES.Running_Hurdles_60 }),
+			new Stations("Long/Triple Jump 1",
+					new DISCIPLINES[] { DISCIPLINES.Jumping_Long, DISCIPLINES.Jumping_Triple }),
+			new Stations("Long/Triple Jump 2",
+					new DISCIPLINES[] { DISCIPLINES.Jumping_Long, DISCIPLINES.Jumping_Triple }),
+			new Stations("High_Jump-l",
+					new DISCIPLINES[] { DISCIPLINES.Jumping_High, DISCIPLINES.Jumping_Pole }),
+			new Stations("High_Jump_ll",
+					new DISCIPLINES[] { DISCIPLINES.Jumping_High, DISCIPLINES.Jumping_Pole }),
+			new Stations("Pole Vault",
+					new DISCIPLINES[] { DISCIPLINES.Jumping_Pole }),
+			new Stations("Shot Throwing l",
+					new DISCIPLINES[] { DISCIPLINES.Throwing_Shot }),
+			new Stations("Shot Throwing ll",
+					new DISCIPLINES[] { DISCIPLINES.Throwing_Shot }),
+			new Stations("Award Ceremony Area",
+					DISCIPLINES.values())
+	};
 }

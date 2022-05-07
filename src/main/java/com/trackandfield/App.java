@@ -2,6 +2,7 @@ package com.trackandfield;
 
 import java.io.FileReader;
 import java.util.Scanner;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -110,22 +111,13 @@ public class App {
 				// put entire group into a buffer
 				final var competitors = new LinkedList<Athletes>(group.athletes);
 
+				// Get slots and durationMinutes from groups method
 				double number_of_slots;
 				int durationMinutes;
 				switch (group.discipline) {
 					case Running_Sprint_60:
 					case Running_Hurdles_60:
 						number_of_slots = 8;
-						durationMinutes = 5;
-						break;
-					case Jumping_Long:
-					case Jumping_Triple:
-					case Jumping_High:
-						number_of_slots = 1;
-						durationMinutes = 5;
-						break;
-					case Throwing_Shot:
-						number_of_slots = 1;
 						durationMinutes = 5;
 						break;
 					case Running_Sprint_200:
@@ -147,21 +139,14 @@ public class App {
 						break;
 				}
 
-				double number_of_competitors = competitors.size();
-
+				double number_of_competitors = competitors.size(); // Number of competitors in each group
+				// number of qualifiers for each group
 				var number_of_subSubComp = Math.ceil(number_of_competitors / number_of_slots);
-				// the main sub competetion is divided into smaller sub competetions if nr of
-				// group members is more than nr of slots : ceil(20 / 8) = 3
+				// max number of athletes for each qualifier
 				var max_number_of_Athletes_in_subCom = Math.ceil(number_of_competitors / number_of_subSubComp);
-				// number of Athlets in a sub_comp ceil(20 / 3) = 7
 
-				// [7][7][6]
-				// [1][1][1]...
-
-				// IF there are more competitors than number of slots, we need to create
-				// qualifiers first
-				// A final will be held after the finals, so we create a final
-
+				// Case 1 example: 2 competitors but less slots. Create final and add both
+				// athletes
 				if (number_of_competitors == 2 && number_of_slots < 2) {
 					var new_final = new SubCompetition(
 							++id,
@@ -172,44 +157,39 @@ public class App {
 
 					subComps.add(new_final);
 
+					// Adding athletes to final
 					for (int j = 0; j < number_of_competitors; j++) {
 						var comp = competitors.pollFirst(); // returns first athlete and removes it from the list
 						if (comp == null)
 							break;
-						// Add athlete to athletes
 						new_final.athletes.add(comp);
 					}
 				}
 
+				// Case 2 example: 20 athletes, 8 slots -> creates 3 qualifiers with 7, 7, 6
+				// competitors each
 				else if (number_of_competitors > number_of_slots) {
-
 					for (int i = 0; i < number_of_subSubComp; i++) {
-						// Create new_subComp competition by calling SubCompetition constructor
 						var new_subComp = new SubCompetition(
 								++id,
 								durationMinutes,
 								false,
 								group,
 								new ArrayList<Athletes>());
-						// 1-sub-com 0 -->7
-						// 2- sub-com 7--> 1
-						// 3- sub-comp 14-->20
+
 						subComps.add(new_subComp);
 
+						// Adding athletes into qualifiers
 						for (int j = 0; j < max_number_of_Athletes_in_subCom; j++) {
 							var comp = competitors.pollFirst(); // returns first athlete and removes it from the list
 							if (comp == null)
 								break;
-							// Add athlete to athletes
+
 							new_subComp.athletes.add(comp);
 						}
 					}
 
-					// When the final is created, we don't need to worry about the list of athletes,
-					// since
-					// that cannot be pre-determined. If the list is empty, we will simply print out
-					// "TBD (to be determined)"
-					// in our schedule
+					// Only adding a final without athletes since we can't foresee qualifier-winners
 					var new_final = new SubCompetition(
 							++id,
 							durationMinutes,
@@ -218,13 +198,9 @@ public class App {
 							new ArrayList<Athletes>());
 
 					subComps.add(new_final);
-
 				}
-				// If all of the competitors can fit inside of one station, or we have more than
-				// 1 competitor in said group, we will only create a final.
-				// Neither a qualifier or a final would get created if there is only 1 athlete
-				// in a group.
 
+				// Case 3 example: 5 competitors, 8 slots -> create final and add athletes
 				else if (number_of_competitors > 1) {
 					var new_final = new SubCompetition(
 							++id,
@@ -239,12 +215,42 @@ public class App {
 						var comp = competitors.pollFirst(); // returns first athlete and removes it from the list
 						if (comp == null)
 							break;
-						// Add athlete to athletes
+
 						new_final.athletes.add(comp);
 					}
 				}
 			}
 			return subComps;
+		}
+
+		// Generate events for schedule
+		public static List<Event> generateEvents(final List<SubCompetition> subComps) {
+			// TODO: finish implementation.
+			for (var stat : Stations.stations) {
+				System.out.println(stat.name);
+			}
+
+			final List<SubCompetition> qualifiers = new ArrayList<SubCompetition>(); // list of subcomps
+			final List<SubCompetition> finals = new ArrayList<SubCompetition>(); // list of subcomps
+
+			for (final var subComp : subComps) {
+				if (subComp.isFinal)
+					finals.add(subComp);
+				else
+					qualifiers.add(subComp);
+			}
+
+			int eventStart = 0;
+			for (final var qualifier : qualifiers) {
+				var age_groups = qualifier.group.age_groups;
+				var sex_groups = qualifier.group.sex_groups;
+
+				var new_event = new Event(eventStart, qualifier);
+				eventStart += new_event.endTime;
+
+			}
+
+			return null;
 		}
 	}
 
@@ -259,15 +265,19 @@ public class App {
 
 		var grps = App.util.generateGroups(atls);
 		// grps.removeIf(x -> x.id != 15);
-		for (var grp : grps)
-			System.out.println(grp);
+		// for (var grp : grps)
+		// System.out.println(grp);
 
 		System.out.println("-----------");
 
 		var subcs = App.util.generateSubCompetition(grps);
 		// subcs.removeIf(x -> x.id > 1);
-		for (var subc : subcs)
-			System.out.println(subc);
+		// for (var subc : subcs)
+		// System.out.println(subc);
+
+		System.out.println("-----------");
+
+		var evts = App.util.generateEvents(subcs);
 
 	}
 }
