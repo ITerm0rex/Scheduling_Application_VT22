@@ -14,7 +14,7 @@ public class App {
 		final static String CSV_NEWLINE_PATTERN = "(\\r\\n|\\n)+";
 
 		public static List<Athletes> generateAthletes() {
-			List<Athletes> athletes = new ArrayList<Athletes>();
+			List<Athletes> athletes = new LinkedList<Athletes>();
 
 			try (FileReader file = new FileReader(CSV_FILE_PATH);
 					Scanner read = new Scanner(file)) {
@@ -90,7 +90,7 @@ public class App {
 								athlete_ageGroup,
 								athlete_sexGroup,
 								athlete_discipline,
-								new ArrayList<Athletes>());
+								new LinkedList<Athletes>());
 						groups.add(new_group); // if an athlete doesn't find a group create a new one
 						new_group.athletes.add(athlete); // and add the athlete to it
 					}
@@ -153,7 +153,7 @@ public class App {
 							durationMinutes,
 							true,
 							group,
-							new ArrayList<Athletes>());
+							new LinkedList<Athletes>());
 
 					subComps.add(new_final);
 
@@ -175,7 +175,7 @@ public class App {
 								durationMinutes,
 								false,
 								group,
-								new ArrayList<Athletes>());
+								new LinkedList<Athletes>());
 
 						subComps.add(new_subComp);
 
@@ -195,7 +195,7 @@ public class App {
 							durationMinutes,
 							true,
 							group,
-							new ArrayList<Athletes>());
+							new LinkedList<Athletes>());
 
 					subComps.add(new_final);
 				}
@@ -207,7 +207,7 @@ public class App {
 							durationMinutes,
 							true,
 							group,
-							new ArrayList<Athletes>());
+							new LinkedList<Athletes>());
 
 					subComps.add(new_final);
 
@@ -226,9 +226,9 @@ public class App {
 		// Generate events for schedule
 		public static List<Event> generateEvents(final List<SubCompetition> subComps) {
 			// TODO: finish implementation.
-			for (var stat : Stations.stations) {
-				System.out.println(stat.name);
-			}
+
+			var stations = Stations.getStations();
+			var all_events = new LinkedList<Event>();
 
 			final List<SubCompetition> qualifiers = new ArrayList<SubCompetition>(); // list of subcomps
 			final List<SubCompetition> finals = new ArrayList<SubCompetition>(); // list of subcomps
@@ -240,17 +240,37 @@ public class App {
 					qualifiers.add(subComp);
 			}
 
+			// Initialize eventStart to 0
 			int eventStart = 0;
-			for (final var qualifier : qualifiers) {
-				var age_groups = qualifier.group.age_groups;
-				var sex_groups = qualifier.group.sex_groups;
+			int id = 0;
+			int delay = 0;
+			for (final var subComp : subComps) {
 
-				var new_event = new Event(eventStart, qualifier);
-				eventStart += new_event.endTime;
+				// Loop through stations
+				for (var station : stations) {
+					if (station.disciplines.contains(subComp.group.discipline)) {
+
+						var new_event = new Event(++id, eventStart, subComp);
+						eventStart = new_event.endTime + delay;
+
+						station.events.add(new_event);
+						all_events.add(new_event);
+						break;
+					}
+				}
+
+				// Loop through the stations again and check for gender & age overlap against
+				// the corresponding time frame+a small buffer
+				// If no overlap: add qualifier to event and add the event to the station, and
+				// pop qualifier from the qualifiers list
+
+				// Repeat process until all qualifiers have been added or until we get
+				// qualifiers that can't be distributed (infinite overlap loop)
+				// In the case of infinite overlap loop, add x amount of time and try again
 
 			}
 
-			return null;
+			return all_events;
 		}
 	}
 
@@ -278,6 +298,15 @@ public class App {
 		System.out.println("-----------");
 
 		var evts = App.util.generateEvents(subcs);
+		// evts.removeIf(x -> x.id > 1);
+		for (var evt : evts)
+			System.out.println(evt);
 
+		System.out.println("-----------");
+
+		var stats = new LinkedList<Stations>(Stations.getStations());
+		// stats.removeIf(x -> x.events.size() == 0);
+		for (var stat : stats)
+			System.out.println(stat);
 	}
 }

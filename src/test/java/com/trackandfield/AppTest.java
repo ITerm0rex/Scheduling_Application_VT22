@@ -57,4 +57,44 @@ public class AppTest {
 	public void sql_test() {
 		SQLiteJDBC.run();
 	}
+
+	@Test
+	public void overlap_test() {
+		var atls = App.util.generateAthletes();
+		var grps = App.util.generateGroups(atls);
+		var subcs = App.util.generateSubCompetition(grps);
+		// subcs.removeIf(x -> x.id > 10);
+
+		int startTime = 0;
+
+		// for (var subc : subcs) {
+		for (var iter = subcs.iterator(); iter.hasNext();) {
+
+			var subc = iter.next();
+			// subc.durationMinutes = 10;
+			if (!iter.hasNext())
+				break;
+
+			var event_1 = new Event(0, startTime, subc);
+			// event_1.endTime = -10;
+			startTime = event_1.endTime;
+
+			subc = iter.next();
+			// subc.durationMinutes = 10;
+
+			var event_2 = new Event(1, startTime, subc);
+			// event_2.endTime = 20;
+			startTime = event_2.endTime;
+
+			System.out.println(startTime);
+
+			System.out.println(event_1.isOverlap(event_2));
+			System.out.println(event_2.isOverlap(event_1));
+
+			assertTrue("e1=!O=e1", event_1.isOverlap(event_1));
+			assertTrue("e2=!O=e2", event_2.isOverlap(event_2));
+
+		}
+	}
+
 }

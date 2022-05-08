@@ -2,8 +2,8 @@ package com.trackandfield;
 
 import java.util.List;
 
-import java.time.Instant;
-import java.time.Duration;
+// import java.time.Instant;
+// import java.time.Duration;
 
 // class competetion
 class SubCompetition {
@@ -11,7 +11,7 @@ class SubCompetition {
 	int durationMinutes;
 	boolean isFinal;
 	Groups group;
-	List<Athletes> athletes; // competitors
+	List<Athletes> athletes;
 
 	public SubCompetition(int id, int durationMinutes, boolean isFinal, Groups group, List<Athletes> athletes) {
 		this.id = id;
@@ -19,6 +19,16 @@ class SubCompetition {
 		this.isFinal = isFinal;
 		this.group = group;
 		this.athletes = athletes;
+	}
+
+	public Boolean isOverlap(SubCompetition subComp) {
+		if (this.athletes.size() + subComp.athletes.size() == 0)
+			return true;
+		for (var atl : subComp.athletes) {
+			if (this.athletes.contains(atl))
+				return true;
+		}
+		return false;
 	}
 
 	@Override

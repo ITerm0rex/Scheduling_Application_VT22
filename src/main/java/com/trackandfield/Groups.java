@@ -56,8 +56,13 @@ class Groups {
 
 	@Override
 	public String toString() {
-		return "Groups [age=" + age_groups + ", athletes#=" + athletes.size() + ", discipline=" + discipline
-				+ ", id=" + id + ", sex=" + sex_groups + "]";
+		return "Groups ["
+		+ "id=" + id
+		+ ", athletes#=" + athletes.size()
+		+ ", age=" + age_groups
+		+ ", sex=" + sex_groups
+		+ ", discipline=" + discipline
+		+ "]";
 	}
 
 }
