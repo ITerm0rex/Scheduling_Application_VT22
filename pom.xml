@@ -5,25 +5,11 @@
 
 	<groupId>com.trackandfield</groupId>
 	<artifactId>scheduling</artifactId>
-	<version>0.0.1</version>
+	<version>0.1</version>
 	<packaging>jar</packaging>
 
 	<name>Scheduling_Application_VT22</name>
 	<url>https://github.com/ITerm0rex/Scheduling_Application_VT22</url>
-
-	<profiles>
-		<profile>
-			<id>downloadSources</id>
-			<properties>
-				<downloadSources>true</downloadSources>
-				<downloadJavadocs>true</downloadJavadocs>
-			</properties>
-		</profile>
-	</profiles>
-
-	<!-- <activeProfiles>
-		<activeProfile>downloadSources</activeProfile>
-	</activeProfiles> -->
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,6 +24,20 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.13.2</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest-core -->
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+			<version>2.2</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -55,16 +55,33 @@
 			<version>3.0.2</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest-core -->
-		<!-- <dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-core</artifactId>
-			<version>1.3</version>
-			<scope>test</scope>
-		</dependency> -->
+		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.9.0</version>
+		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.6</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-lang3</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.12.0</version>
+		</dependency>
 	</dependencies>
-
 
 	<build>
 		<pluginManagement>
@@ -91,14 +108,6 @@
 				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>3.2.0</version>
-					<groupId>org.apache.maven.plugins</groupId>
-					<configuration>
-						<archive>
-							<manifest>
-								<mainClass>com.trackandfield.App</mainClass>
-							</manifest>
-						</archive>
-					</configuration>
 				</plugin>
 				<plugin>
 					<artifactId>maven-install-plugin</artifactId>

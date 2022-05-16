@@ -1,10 +1,10 @@
-package com.trackandfield;
+package com.trackandfield.io;
 
-import java.sql.*;
+import java.sql.DriverManager;
 import java.util.Properties;
 
 public class SQLiteJDBC {
-	private static final String Athletes_SQL = """
+	public static String Athletes_SQL = """
 			create table Athletes (
 				Club varchar(64),
 				Name varchar(64),
@@ -25,7 +25,12 @@ public class SQLiteJDBC {
 			);
 			""";
 
-	public static void run() {
+	public static String CSV_FILE_PATH = "./resources/registration-list.csv";
+	// public static String CSV_FILE_PATH = "./resources/schema-exempel.csv";
+
+	public static String EXTENSION_PATH = "./sqlite-csv/csv.dll";
+
+	public static void test() {
 		try {
 			var prop = new Properties();
 			prop.setProperty("enable_load_extension", "true");
@@ -33,14 +38,13 @@ public class SQLiteJDBC {
 			try (var con = DriverManager.getConnection("jdbc:sqlite::memory:", prop);
 					var stmt = con.createStatement()) {
 
-				stmt.execute("select load_extension(\"./sqlite-csv/csv.dll\");");
+				stmt.execute("select load_extension(\"" + EXTENSION_PATH + "\");");
 
 				stmt.execute("CREATE VIRTUAL TABLE IF NOT EXISTS temp.csv USING csv("
-						// + "filename=\"./resources/schema-exempel.csv\""
+						+ "filename = \"" + CSV_FILE_PATH + "\""
 						// + ",header=yes"
 						// + ",fsep=','"
 						// + ",rsep='\n'"
-						+ "filename = \"./resources/registration-list.csv\""
 						+ ",schema=\"" + Athletes_SQL + "\""
 						+ ");");
 
@@ -57,6 +61,12 @@ public class SQLiteJDBC {
 		} catch (Exception e) {
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 		}
-		System.out.println("[Opened database successfully]");
+		System.out.println("<<<Opened database/csv-file successfully>>>");
+	}
+}
+
+final class SQLiteJDBCTest {
+	public static void main(String args[]) {
+		SQLiteJDBC.test();
 	}
 }
