@@ -4,38 +4,59 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import javax.annotation.CheckForNull;
 
 enum AGE_GROUPS {
-	_8,
-	_9_10,
-	_11_12,
-	_13_14,
-	_15_16,
-	_17_18,
-	ADULT,
-	INVALID
+	_8("Under 8"),
+	_9_10("9 to 10"),
+	_11_12("11 to 12"),
+	_13_14("13 to 14"),
+	_15_16("15 to 16"),
+	_17_18("17 to 18"),
+	ADULT("Adult");
+
+	final private String description;
+
+	AGE_GROUPS(String description) {
+		this.description = description;
+	}
+
+	@Override
+	public String toString() {
+		return description;
+	}
 }
 
 enum SEX_GROUPS {
 	M,
-	F,
-	INVALID
+	F
 }
 
 enum DISCIPLINES {
-	Running_Sprint_60,
-	Running_Sprint_200,
-	Running_Middle_800,
-	Running_Middle_1500,
-	Running_Long_3000,
-	Running_Hurdles_60,
-	Jumping_Long,
-	Jumping_Triple,
-	Jumping_High,
-	Jumping_Pole,
-	Throwing_Shot,
-	INVALID
+	Running_Sprint_60(8, 5),
+	Running_Sprint_200(6, 5),
+	Running_Middle_800(6, 5),
+	Running_Middle_1500(6, 10),
+	Running_Long_3000(6, 15),
+	Running_Hurdles_60(8, 5),
+	Jumping_Long(1, 5),
+	Jumping_Triple(1, 5),
+	Jumping_High(1, 15),
+	Jumping_Pole(1, 5),
+	Throwing_Shot(1, 5);
+
+	final public int slots;
+	final public int durationMinutes;
+
+	DISCIPLINES(int slots, int durationMinutes) {
+		this.slots = slots;
+		this.durationMinutes = durationMinutes;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString().replace('_', ' ');
+	}
 }
 
 class Groups {
@@ -57,12 +78,12 @@ class Groups {
 	@Override
 	public String toString() {
 		return "Groups ["
-		+ "id=" + id
-		+ ", athletes#=" + athletes.size()
-		+ ", age=" + age_groups
-		+ ", sex=" + sex_groups
-		+ ", discipline=" + discipline
-		+ "]";
+				+ "id=" + id
+				+ ", athletes#=" + athletes.size()
+				+ ", age=" + age_groups
+				+ ", sex=" + sex_groups
+				+ ", discipline=" + discipline
+				+ "]";
 	}
 
 }
@@ -72,6 +93,9 @@ abstract class AthleteGroupAttributes {
 	int age;
 	List<String> records;
 
+	/**
+	 * @return List of corresponding disciplines
+	 */
 	final public List<DISCIPLINES> getDisciplines() {
 		// disciplines is a list of all disiplines.
 		List<DISCIPLINES> disciplines = new ArrayList<>(Arrays.asList(DISCIPLINES.values()));
@@ -84,12 +108,13 @@ abstract class AthleteGroupAttributes {
 			else
 				i++;
 		}
-		disciplines.remove(DISCIPLINES.INVALID); // removes invalid
 		return disciplines;
 	}
 
-	// Check and return the sex of an athlete
-	@Nullable
+	/**
+	 * @return sex of athlete
+	 */
+	@CheckForNull
 	final public SEX_GROUPS getSexGroup() {
 		if (this.sex == 'M')
 			return SEX_GROUPS.M;
@@ -100,8 +125,10 @@ abstract class AthleteGroupAttributes {
 		return null;
 	}
 
-	// Check and return the age group of an athlete
-	@Nullable
+	/**
+	 * @return age group of athlete
+	 */
+	@CheckForNull
 	final public AGE_GROUPS getAgeGroup() {
 		if (this.age <= 8)
 			return AGE_GROUPS._8;

@@ -5,7 +5,7 @@
 
 	<groupId>com.trackandfield</groupId>
 	<artifactId>scheduling</artifactId>
-	<version>0.1</version>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 
 	<name>Scheduling_Application_VT22</name>
