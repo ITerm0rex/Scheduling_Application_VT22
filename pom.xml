@@ -41,13 +41,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
-		<dependency>
-			<groupId>org.xerial</groupId>
-			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.36.0.3</version>
-		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305 -->
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
@@ -94,6 +87,19 @@
 				</plugin>
 				<!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
 				<plugin>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.2.0</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<addClasspath>true</addClasspath>
+								<mainClass>com.trackandfield.App</mainClass>
+							</manifest>
+							<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+						</archive>
+					</configuration>
+				</plugin>
+				<plugin>
 					<artifactId>maven-resources-plugin</artifactId>
 					<version>3.0.2</version>
 				</plugin>
@@ -105,10 +111,7 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.22.1</version>
 				</plugin>
-				<plugin>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.2.0</version>
-				</plugin>
+
 				<plugin>
 					<artifactId>maven-install-plugin</artifactId>
 					<version>2.5.2</version>

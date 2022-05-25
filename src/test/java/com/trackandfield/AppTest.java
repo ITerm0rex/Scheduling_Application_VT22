@@ -1,27 +1,39 @@
 package com.trackandfield;
 
 import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.trackandfield.io.CSVHandler;
-import com.trackandfield.io.JSONHandler;
-import com.trackandfield.io.SQLiteJDBC;
 
 import org.junit.Test;
 
 public class AppTest {
 
+	String registration_list_fileName = "./resources/registration-list.csv";
+	List<String[]> athlete_list;
+
+	List<Athletes> test_athletes_list = new ArrayList<>();
+
+	public AppTest() throws Exception {
+		this.athlete_list = CSVHandler.CSVReader(registration_list_fileName);
+		System.out.println("athlete_list: loaded.");
+
+	}
+
 	@Test
-	public void testLength() {
+	public void testLengthOfAthletes() {
 		var records = asList("", "", "", "", "", "", "", "", "", "", "");
 
 		records.set(1, "123:345.789");
 		records.set(10, "1337.42");
 
-		var atl = new Athletes(0, "club", "name", "surname", 'å', 180, records);
+		var atl = new Athletes(0, "club", "name", "surname", 'M', 180, records);
 		System.out.println(atl);
 		System.out.println(atl.getAgeGroup());
 		System.out.println(atl.getSexGroup());
@@ -33,52 +45,58 @@ public class AppTest {
 	}
 
 	@Test
-	public void testLengthFromFile() {
+	public void testGenerateGroup() throws Exception {
+		var atls = Athletes.generateAthletes(athlete_list);
 
-		var atls = App.util.generateAthletes();
-		atls.removeIf(x -> x.id != 2);
+		var grps = Groups.generateGroups(atls);
+
+		assertEquals(grps.size(), 132);
+	}
+
+	@Test
+	public void testGenerateSubCompetition() throws Exception {
+		var atls = Athletes.generateAthletes(athlete_list);
+
+		var grps = Groups.generateGroups(atls);
+
+		var subcs = SubCompetition.generateSubCompetition(grps);
+
+		subcs.forEach(s -> {
+			System.err.println(s.group.discipline.timeAproxFunction.apply(s));
+		});
+
+		assertEquals(subcs.size(), 906);
+	}
+
+	@Test
+	public void testLengthFromFile() throws Exception {
+
+		var atls = Athletes.generateAthletes(athlete_list);
+		atls.removeIf(x -> x.id > 1);
 		for (var atl : atls)
 			System.out.println(atl);
 
 		System.out.println("-----------");
 
-		var grps = App.util.generateGroups(atls);
+		var grps = Groups.generateGroups(atls);
 		// grps.removeIf(x -> x.id != 15);
 		for (var grp : grps)
 			System.out.println(grp);
 
 		System.out.println("-----------");
 
-		var subcs = App.util.generateSubCompetition(grps);
+		var subcs = SubCompetition.generateSubCompetition(grps);
 		// subcs.removeIf(x -> x.id > 1);
 		for (var subc : subcs)
 			System.out.println(subc);
 
-		var len = atls.get(0).getDisciplines().size();
-
-		assertTrue("length is " + len, len == 4);
 	}
 
 	@Test
-	public void sql_test() {
-		SQLiteJDBC.test();
-	}
-
-	@Test
-	public void json_test() {
-		JSONHandler.test();
-	}
-
-	@Test
-	public void csv_test() {
-		CSVHandler.test();
-	}
-
-	@Test
-	public void overlap_test() {
-		var atls = App.util.generateAthletes();
-		var grps = App.util.generateGroups(atls);
-		var subcs = App.util.generateSubCompetition(grps);
+	public void overlap_test() throws Exception {
+		var atls = Athletes.generateAthletes(athlete_list);
+		var grps = Groups.generateGroups(atls);
+		var subcs = SubCompetition.generateSubCompetition(grps);
 		// subcs.removeIf(x -> x.id > 10);
 
 		var startTime = Instant.now();
@@ -101,9 +119,6 @@ public class AppTest {
 				var event_2 = new Event(1, startTime, end_time, subc, stat);
 				startTime = event_2.endTime;
 
-				System.out.println(event_1.isOverlap(event_2));
-				System.out.println(event_2.isOverlap(event_1));
-
 				assertTrue("e1=!O=e1", event_1.isOverlap(event_1));
 				assertTrue("e2=!O=e2", event_2.isOverlap(event_2));
 			}
@@ -112,4 +127,16 @@ public class AppTest {
 		}
 	}
 
+	@Test
+	public void timParseTest() {
+		Double sum = 0.0;
+		var tt = "1:23.444".split(":", -1);
+		if (tt.length == 2) {
+			sum += Double.parseDouble(tt[0]) * 60.0;
+			sum += Double.parseDouble(tt[1]);
+		} else {
+			sum += Double.parseDouble(tt[0]);
+		}
+		System.out.println(sum);
+	}
 }

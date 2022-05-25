@@ -1,37 +1,16 @@
 package com.trackandfield.io;
 
 import java.io.FileReader;
-import java.util.List;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 public class JSONHandler {
-	static private class json_stucture {
-		List<JsonObject> stations;
-	}
-
-	static String JSON_PATH = "./resources/format.json";
-
-	public static void test() {
-		var gson = new Gson();
-		try (var reader = new FileReader(JSON_PATH)) {
-
-			var obj = gson.fromJson(reader, json_stucture.class);
-
-			var ress = obj.stations.get(0).get("running").getAsJsonArray();
-
-			for (var res : ress)
-				System.out.println(res.getAsInt());
-
+	public static <T> T ConfigReader(final String fileName, final Class<T> format) throws Exception {
+		try (final var reader = new FileReader(fileName)) {
+			final var gson = new Gson();
+			return gson.fromJson(reader, format);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new Exception("File: " + fileName + "\n" + e, e);
 		}
-	}
-}
-
-final class JSONHandlerTest {
-	public static void main(String args[]) {
-		JSONHandler.test();
 	}
 }

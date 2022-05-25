@@ -1,86 +1,144 @@
 @startuml Class Diagram
-title Class Diagram
 
-
-' interface schedule
 class schedule
 {
-	-place:string
-	-date: string
-	-time: string
-	-group: string
-	-competitors: array
-	-disipline: string
-	-station: string or int
-	-round:string
-	+CreateSchedule (): void
-	+updateSchedule(): void
-	+printSchedule (): void
+	' -csvFile
+	+SortFunctions: <enum>
+	+schedule(String): schedule
+	---
+	...
+	+printSchedule(): void
+	{static}	+printStatistics(T[] a, List<J> b, BiPredicate<T, J> comp): void
 }
 
-class Stations
+class configFromat
 {
-	-name: string
-	-events: List<Event>
-	+getStation(): void
-}
-
-class Groups
-{
-	-id: int
-	-age_groups: <AGE_GROUP> enum
-	-sex: <SEX_GROUP> enum
-	-discipline: <DISCIPLINE> enum
-	-athletes: List<Athletes>
-	+generateGroups(): List<Groups>
-}
-
-class AthleteGroupAttributes
-{
-	-sex: <SEX_GROUP> enum
-	-age: int
-	-records : List<string>
-	+getDisciplines(): List<DISCIPLINE>
-	+getSexGroup(): AGE_GROUP
-	+getAgeGroup(): SEX_GROUP
-
+	+registration_list_input_file: String
+	+event_delay_input_file: String
+	+schedule_output_file: String
+	+schedule_start: String
+	+break_after_each_event: Integer
+	+sorting_procedure: List<String>
+	+toString(): String
+	+get_sorting_procedure(): Comparator<Event>
 }
 
 class Athletes
 {
-	-id: int
-	-club: string
-	-name: string
-	-surname: string
+	+id: int
+	+club: string
+	+name: string
+	+surname: string
+	+sex: char
+	+age: int
+	+records: List<string>
+	+toString(): String
+	+getDisciplines(): List<DISCIPLINE>
+	+getSexGroup(): AGE_GROUP
+	+getAgeGroup(): SEX_GROUP
+	{static}	+generateAthletes(List<String>): List<Athletes>
+}
+
+class Groups
+{
+	+id: int
+	+age_groups: <AGE_GROUP> enum
+	+sex_groups: <SEX_GROUP> enum
+	+discipline: <DISCIPLINE> enum
+	+athletes: List<Athletes>
+	+toString(): String
+	{static} +generateGroups(): List<Groups>
+
+}
+
+class SubCompetition
+{
+	+id: int
+	+isFinal: bool
+	+group: Groups
+	+athletes: List<Athlete>
+	+toString(): String
+	+containsSameAthletes(): bool
+	{static}	 +generateSubCompetition(): List<SubCompetition>
+
 }
 
 class Event
 {
-	-startTime: int
-	-endTime: int
-	-subCompetition: SubCompetition
-	+generateEvents(): List<Event>
+	+id: int
+	+startTime: Instant
+	+endTime: Instant
+	+subCompetition: SubCompetition
+	+station: <Station> enum
+	-hms: DateTimeFormatter
+	---
+	+toString(): String
+	+isOverlap(): bool
+	+isOverlapAll(): bool
+	+getStartTime(): String
+	+getEndTime(): String
+	---
+	+moveEvent(): void
+	{static}	+generateEvents(): List<Event>
+	{static}	+improveEvents(List<Event>): List<Event>
 }
-class Sub_competition
+
+class EventState
 {
-	-id: int
-	-durationMinutes: int
-	-isFinal: bool
-	-group: Groups
-	-athletes: List<Athlete>
-	+generateSubCompetition(): List<SubCompetition>
-
+	+id: int
+	+breakAfterEvent: int
+	+eventStart: Instant
+	+delaysMap: HashMap
+	+toString(): String
+	+setDelaysFromFile(String): void
 }
 
 
-Athletes " 0-N "--> " 1 " Stations
-Athletes --> schedule
+class CSVHandler
+{
+	{static}	+CSVWriter(String fileName, List<String[]> data): void
+	{static}	+CSVReader(String fileName): List<String>
+}
 
-Athletes" 1..N " --> " 1..N " Sub_competition
+class JSONHandler
+{
+	{static}	+CSVWriter(String fileName, Class<T> format): void
+}
 
-AthleteGroupAttributes "1" <|- " N " Athletes
 
-Sub_competition .-> schedule
-Stations "1" <-- "N" Sub_competition
-Groups "1" o-- "N" Athletes
+
+enum STATIONS {
+	...
+}
+enum AGE_GROUP {
+	...
+}
+enum SEX_GROUP {
+	...
+}
+enum DISCIPLINE {
+	...
+	-runningCompsAproxTime(): Function<SubCompetition, Duration>
+}
+enum SortFunctions {
+	...
+}
+
+
+
+
+
+schedule " 1 " -- " N " Event
+SubCompetition " 1" .-> " N " Athletes
+Groups " 1 " <-. " 1 " SubCompetition
+SubCompetition " 1 " o-- " 1 " Event
+' AthleteGroupAttributes " 1 "  <|--  " N " Athletes
+Groups " 1 " *-- " N " Athletes
+EventState *-- Event
+configFromat *-- schedule
+
+schedule -- JSONHandler
+schedule -- CSVHandler
+
+
 @enduml

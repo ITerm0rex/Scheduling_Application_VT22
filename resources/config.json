@@ -1,0 +1,17 @@
+{
+	"registration_list_input_file": "./resources/registration-list.csv",
+	"event_delay_input_file": "./resources/delay.csv",
+	"schedule_output_file": "./resources/Schedule.csv",
+	"schedule_start": "2022-05-20T08:00:00Z",
+	"break_after_each_event": 5,
+	"sorting_procedure": [
+		// "SortByGroupId",
+		// "SortByDiscipline",
+		// "SortBySex",
+		"SortByTime",
+		"SortByStation"
+		// "SortById"
+		// "reverseOrder"
+		// "SortByAgeGroup",
+	]
+}
